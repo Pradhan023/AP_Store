@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* This overrides browser autofill styles globally */
+input:-webkit-autofill,
+/* input:-webkit-autofill:hover,  */
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #fff !important;
+  -webkit-box-shadow: 0 0 0 30px #374151 inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+@layer utilities {
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: rgb(62, 101, 95); /* Change thumb color */
+    border-radius: 10px; /* Make it rounded */
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: #95b2a2; /* Change track color */
+  }
+}
