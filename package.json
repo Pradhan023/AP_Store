@@ -2,31 +2,20 @@
   "name": "apstore",
   "version": "1.0.0",
   "description": "",
-  "main": "server.ts",
+  "main": "backend/server.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:backend": "nodemon backend/src/server.ts",
+    "dev:backend": "nodemon backend/server.js",
     "dev:frontend": "cd frontend && npm run dev",
-    
     "start": "node backend/dist/server.js",
-    
-    "build": "npm run build:backend && npm run build:frontend",
-    "build:backend": "tsc --project backend/tsconfig.json",
-    "build:frontend": "cd frontend && npm run build",
-    
-    "preinstall": "npm install --prefix frontend",
-    "postinstall": "npm run build",
-    
+    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend",
     "serve": "node backend/dist/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
-    "@types/cookie-parser": "^1.4.8",
-    "@types/jsonwebtoken": "^9.0.9",
-    "@types/multer": "^1.4.12",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.5.1",
     "cookie-parser": "^1.4.7",
@@ -40,11 +29,6 @@
     "stripe": "^17.7.0"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/express": "^4.17.21",
-    "@types/mongoose": "^5.11.96",
-    "@types/node": "^22.13.5",
-    "@types/stripe": "^8.0.416",
     "concurrently": "^9.1.2",
     "nodemon": "^3.1.9"
   }

@@ -1,6 +1,6 @@
-import { User } from "../model/user.model";
-import { Product } from "../model/product.model";
-import { Order } from "../model/order.model";
+import { User } from "../model/user.model.js";
+import { Product } from "../model/product.model.js";
+import { Order } from "../model/order.model.js";
 
 export const getanalyticsData = async () => {
   const totalUser = await User.countDocuments({}); //countDocuments() is a mongoose method which is used to count the number of documents in the collection
@@ -35,7 +35,7 @@ export const getanalyticsData = async () => {
 
 
 
-export const dailysalesData = async (startDate: Date, endDate: Date) => {
+export const dailysalesData = async (startDate,endDate) => {
   try {
     const salesdata = await Order.aggregate([
       {
@@ -123,7 +123,7 @@ export const dailysalesData = async (startDate: Date, endDate: Date) => {
 };
 
 // date range
-export function getDatesInRange(startDate: Date, endDate: Date) {
+export function getDatesInRange(startDate,endDate) {
   const dates = [];
   let currentDate = new Date(startDate);
 

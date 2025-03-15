@@ -1,6 +1,6 @@
 import e from "express";
-import { protectedroute } from "../middleware/auth.middleware";
-import { checkoutSuccess, createCheckoutSession } from "../controller/payment.controller";
+import { protectedroute } from "../middleware/auth.middleware.js";
+import { checkoutSuccess, createCheckoutSession } from "../controller/payment.controller.js";
 const route = e.Router();
 
 

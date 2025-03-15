@@ -1,4 +1,3 @@
-import { Request } from "express";
 import multer from "multer";
 import path from 'path'
 
@@ -14,7 +13,7 @@ const storage = multer.diskStorage({
 });
 
 
-const checkFilterfile = (req:Request,file:Express.Multer.File,cb:multer.FileFilterCallback)=>{
+const checkFilterfile = (req,file,cb)=>{
     if(file.mimetype.startsWith('image')){
         cb(null,true);
     }

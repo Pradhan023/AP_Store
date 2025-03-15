@@ -31,7 +31,7 @@ const App = () => {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={user?.user?.role !== "admin" ? <Home /> : <AdminDashboard/>} />
         <Route
           path="/login"
           element={user?.success ? user?.user?.role === "admin" ? <AdminDashboard /> : <Navigate to="/" /> : <Login />}

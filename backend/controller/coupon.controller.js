@@ -1,11 +1,6 @@
-import { Request, Response } from "express";
-import { Coupon } from "../model/coupon.model";
-import { IUser } from "../model/user.model";
+import { Coupon } from "../model/coupon.model.js";
 
-export const getCouponController = async (
-  req: Request & { user?:IUser },
-  res: Response
-): Promise<Response | void> => {
+export const getCouponController = async (req,res)=> {
     try {
         const coupon = await Coupon.find({userId:req.user?._id})
 
@@ -28,10 +23,7 @@ export const getCouponController = async (
         });
     }
 };
-export const validateCouponController = async (
-  req: Request & { user?:IUser },
-  res: Response
-): Promise<Response | void> => {
+export const validateCouponController = async (req,res)=> {
     try {
         const {code} = req.body;
         const coupon = await Coupon.find({code:code,userId:req.user?._id,isActive:true})

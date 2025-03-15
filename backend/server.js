@@ -1,19 +1,19 @@
 import dotenv from 'dotenv'
-import express,{Express} from "express";
-import authroutes from "./routes/auth.route";
-import productroutes from "./routes/product.route";
-import cartroutes from "./routes/cart.route"
-import couponroutes from "./routes/coupon.route"
-import paymentroutes from "./routes/payment.route"
-import analyticsroutes from "./routes/analytics.route"
-import connection from './lib/db';
+import express from "express";
+import authroutes from "./routes/auth.route.js";
+import productroutes from "./routes/product.route.js";
+import cartroutes from "./routes/cart.route.js"
+import couponroutes from "./routes/coupon.route.js"
+import paymentroutes from "./routes/payment.route.js"
+import analyticsroutes from "./routes/analytics.route.js"
+import connection from './lib/db.js';
 import cookieParser from 'cookie-parser'
 import cors from 'cors';
 import path from 'path';
 
 dotenv.config();
 
-const app:Express = express();
+const app = express();
 
 
 const PORT = process.env.PORT || 3000;
@@ -46,7 +46,7 @@ if(process.env.NODE_ENV === 'production'){
     })
 }
 
-app.listen(PORT,():void=>{
+app.listen(PORT,()=>{
     console.log(`Sever is live on Port ${PORT}`)
     connection()
 })

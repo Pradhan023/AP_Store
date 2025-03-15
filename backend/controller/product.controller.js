@@ -1,30 +1,17 @@
-import { Request, Response } from "express";
-import { Product } from "../model/product.model";
-import { redis } from "../lib/redis";
-import cloudinary from "../lib/cloudinary";
+import { Product } from "../model/product.model.js";
+import { redis } from "../lib/redis.js";
+import cloudinary from "../lib/cloudinary.js";
 import fs from "fs";
 
-interface IBody {
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  category: string;
-}
 
-
-
-export const getAllProductsController = async (
-  req: Request,
-  res: Response
-):Promise<Response | void> => {
+export const getAllProductsController = async (req,res) => {
   try {
     const products = await Product.find({});
     return res.status(200).json({
         success:true,
         data:products
     })
-  } catch (err: unknown) {
+  } catch (err) {
     console.log("Error in getting all products", err);
     const errorMessage =
       err instanceof Error ? err.message : "Unknown error occurred";
@@ -36,7 +23,7 @@ export const getAllProductsController = async (
   }
 };
 
-export const getFeaturedProductsController = async (req:Request , res:Response):Promise<Response | void>=>{
+export const getFeaturedProductsController = async (req,res)=>{
   try{
     // first of all check if data is in redis for faster response
     let cachedProducts = await redis.get("featured_Products");
@@ -72,7 +59,7 @@ export const getFeaturedProductsController = async (req:Request , res:Response):
   }
 }
 
-export const createProductController = async(req:Request<{},{},IBody>,res:Response):Promise<Response | void>=>{
+export const createProductController = async(req,res)=>{
   try{
     const{name,description,price,category} = req.body;
     const image = req?.file?.path;  // req.file.path is used to get the path of the uploaded image
@@ -108,7 +95,7 @@ export const createProductController = async(req:Request<{},{},IBody>,res:Respon
   }
 }
 
-export const deleteProductController = async(req:Request<{id:string}>,res:Response):Promise<Response | void>=>{
+export const deleteProductController = async(req,res)=>{
   try{
     const{id} = req.params;
     const product = await Product.findById(id);
@@ -128,7 +115,7 @@ export const deleteProductController = async(req:Request<{id:string}>,res:Respon
       message:"Product deleted successfully"
     })
       }
-  catch(err:any){
+  catch(err){
     console.log(err);
     return res.status(500).json({
       success:false,
@@ -138,7 +125,7 @@ export const deleteProductController = async(req:Request<{id:string}>,res:Respon
   }
 }
 
-export const getRecommendedProductsController = async (req:Request , res:Response):Promise<Response | void>=>{
+export const getRecommendedProductsController = async (req,res)=>{
   try{
     const recommendedProduct = await Product.aggregate([
       {
@@ -171,7 +158,7 @@ export const getRecommendedProductsController = async (req:Request , res:Respons
   }
 }
 
-export const getProductsbyCategoryController = async(req:Request,res:Response):Promise<Response | void>=>{
+export const getProductsbyCategoryController = async(req,res)=>{
   try{
     const{category} = req.params;
     const product = await Product.find({category}).lean(); //lean() is used to convert mongoose object to normal javascript object ,which is good for performance , resulting object will not have any of the Mongoose document methods, such as save(), remove(), etc. if we dont want to modify the original object then we can use lean() method
@@ -190,7 +177,7 @@ export const getProductsbyCategoryController = async(req:Request,res:Response):P
   }
 }
 
-export const toggleFeaturedProductController = async(req:Request<{id:string}>,res:Response):Promise<Response | void>=>{
+export const toggleFeaturedProductController = async(req,res)=>{
   try{
     const {id} = req.params;
     const product = await Product.findById(id);
@@ -208,7 +195,7 @@ export const toggleFeaturedProductController = async(req:Request<{id:string}>,re
       data:product
     })
   }
-  catch(err:any){
+  catch(err){
     console.log(err);
     return res.status(500).json({
       success:false,

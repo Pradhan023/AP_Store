@@ -1,12 +1,7 @@
-import { Request, Response } from "express";
-import { IUser } from "../model/user.model";
-import { Product } from "../model/product.model";
+import { Product } from "../model/product.model.js";
 
 // get cart product from db or redis
-export const getProductfromCartController = async (
-  req: Request & { user?: IUser },
-  res: Response
-): Promise<Response | void> => {
+export const getProductfromCartController = async (req,res) => {
   try {
     const products = await Product.find({
       _id: { $in: req.user?.cartItems.map((item) => item.product) },
@@ -33,10 +28,7 @@ export const getProductfromCartController = async (
 };
 
 // add product to cart
-export const addProductToCartController = async (
-  req: Request & { user?: IUser },
-  res: Response
-): Promise<Response | void> => {
+export const addProductToCartController = async (req,res) => {
   try {
     const { productId } = req.body;
     const user = req.user;
@@ -65,10 +57,7 @@ export const addProductToCartController = async (
 };
 
 //  delete product from cart whether if its quantity is 1 or more or product is different
-export const removeProductfromCartController = async (
-  req: Request<{ productId: string }> & { user?: IUser },
-  res: Response
-): Promise<Response | void> => {
+export const removeProductfromCartController = async (req,res)=> {
   try {
     const { productId } = req.body;
     const user = req.user;
@@ -92,10 +81,7 @@ export const removeProductfromCartController = async (
 };
 
 // update quantity of product
-export const updateQuantityfromCartController = async (
-  req: Request<{ id: string }> & { user?: IUser },
-  res: Response
-): Promise<Response | void> => {
+export const updateQuantityfromCartController = async (req,res)=> {
   try {
     const { id: productId } = req.params; //id params is in string
     const { quantity } = req.body;

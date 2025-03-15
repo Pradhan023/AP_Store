@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@stripe/stripe-js": "^5.9.2",
+    "apstore": "file:..",
     "axios": "^1.8.1",
     "framer-motion": "^12.4.10",
     "lucide-react": "^0.477.0",

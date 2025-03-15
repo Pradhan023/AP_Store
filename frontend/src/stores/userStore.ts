@@ -33,7 +33,7 @@ const UserStore = create<IUserStore>((set, get) => ({
         email,
         password,
       });
-      set({ user: res.data, loading: false });
+      set({ loading: false });
       toast.success(res.data.message);
       return res.data.success;
     } catch (error: any) {

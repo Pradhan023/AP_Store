@@ -1,22 +1,15 @@
-import { Request, Response } from "express";
-import { Coupon } from "../model/coupon.model";
-import { IUser, User } from "../model/user.model";
-import { stripe } from "../lib/stripe";
+import { Coupon } from "../model/coupon.model.js";
+import { User } from "../model/user.model.js";
+import { stripe } from "../lib/stripe.js";
 import dotenv from "dotenv";
-import { Iproducts, Order } from "../model/order.model";
-import Stripe from "stripe";
-import mongoose from "mongoose";
+import { Order } from "../model/order.model.js";
 
 dotenv.config();
 
-export const createCheckoutSession = async (
-  req: Request & { user?: IUser },
-  res: Response
-) => {
+export const createCheckoutSession = async (req,res) => {
   try {
     // product (in array) and couponCode if user have in body
     const { products, couponCode } = req.body;
-
     // check whether the product type is valid or not in form of array or not
     if (!Array.isArray(products) || products.length === 0) {
       return res.status(400).json({
@@ -52,7 +45,7 @@ export const createCheckoutSession = async (
     if (couponCode) {
       coupon = await Coupon.findOne({
         code: couponCode,
-        userId: new mongoose.Types.ObjectId(req.user?.id), // ✅ Convert to ObjectId
+        userId: req.user?.id, 
 
         isActive: true,
       });
@@ -63,8 +56,9 @@ export const createCheckoutSession = async (
       }
     }
 
-    //  Define typed session parameters
-    const params: Stripe.Checkout.SessionCreateParams = {
+
+    // create session for payment , it will redirect to strip payment page , with this session id which we will get from here
+    const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"], // it can be card or any other payment method like netbanking
       line_items: lineItems,
       mode: "payment", // it can be payment or subscription
@@ -126,10 +120,7 @@ export const createCheckoutSession = async (
           }))
         ),
       },
-    };
-
-    // create session for payment , it will redirect to strip payment page , with this session id which we will get from here
-    const session = await stripe.checkout.sessions.create(params);
+    });
 
     // create coupon only if customer is buying more than 200 or any amount then discounted coupon will work for next purchase
     if (totalamount >= 2000) {
@@ -141,7 +132,7 @@ export const createCheckoutSession = async (
       id: session.id, // with this session id we will to redirect to the strip payment page
       totalAmount: totalamount / 100, // so that we can get in dollars not in cent or paisa
     });
-  } catch (error: any) {
+  } catch (error) {
     console.log("Error in creating checkout session", error);
     return res.status(500).json({
       success: false,
@@ -152,7 +143,7 @@ export const createCheckoutSession = async (
 };
 
 //  user will be redirected to this page after successful payment , user wants to check the status of the payment is success or not , for this we create order in our database
-export const checkoutSuccess = async (req: Request, res: Response) => {
+export const checkoutSuccess = async (req,res) => {
   try {
     const { sessionId } = req.body; // it will get the session id from the body which we get from the strip payment page after successful payment , this will use to get the status of the payment
     const session = await stripe.checkout.sessions.retrieve(sessionId); // it will get the status of the payment
@@ -175,7 +166,7 @@ export const checkoutSuccess = async (req: Request, res: Response) => {
         const neworder = new Order(
           {
             user: session.metadata.userId,
-            products: products.map((item: Iproducts) => ({
+            products: products.map((item) => ({
               product: item.product,
               quantity: item.quantity,
               price: item.price,
@@ -196,7 +187,7 @@ export const checkoutSuccess = async (req: Request, res: Response) => {
         });
       }
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error in processing successful checkout", error);
     return res.status(500).json({
       success: false,
@@ -206,7 +197,7 @@ export const checkoutSuccess = async (req: Request, res: Response) => {
   }
 };
 
-async function createStripcoupon(discountpercentage: number) {
+async function createStripcoupon(discountpercentage) {
   const coupon = await stripe.coupons.create({
     // it will create a coupon in strip and return the id of the coupon
     name: "discount", // it can be any name
@@ -216,8 +207,8 @@ async function createStripcoupon(discountpercentage: number) {
   return coupon.id;
 }
 
-async function createnewCoupon(userId: string) {
-  await Coupon.deleteOne({ userId: new mongoose.Types.ObjectId(userId) });
+async function createnewCoupon(userId) {
+  await Coupon.deleteOne({ userId: userId });
   // create new coupon
   const newcoupon = new Coupon({
     code: "GIFT" + Math.random().toString(36).substring(2, 8).toUpperCase(),
@@ -230,7 +221,7 @@ async function createnewCoupon(userId: string) {
 }
 
 // clear cart after succesfull payment
-const clearUserCart = async (userId: string) => {
+const clearUserCart = async (userId) => {
   try {
     //     The findByIdAndUpdate() function searches for the user with the given userId.
     // It sets cartItems to an empty array, effectively removing all items.

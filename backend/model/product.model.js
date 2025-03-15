@@ -1,4 +1,4 @@
-import mongoose, { InferSchemaType } from "mongoose";
+import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
     name:{
@@ -34,8 +34,7 @@ const productSchema = new mongoose.Schema({
     }
 },{ timestamps : true });
 
-type IProduct = InferSchemaType<typeof productSchema>;
 
-const Product = mongoose.model<IProduct>("Product",productSchema);
+const Product = mongoose.model("Product",productSchema);
 
 export { Product };

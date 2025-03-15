@@ -1,17 +1,9 @@
-import { Request, Response } from "express";
-import { User, IUser } from "../model/user.model"; 
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { Types } from "mongoose";
-import { redis } from "../lib/redis";
+import { User } from "../model/user.model.js"; 
+import jwt from "jsonwebtoken";
+import { redis } from "../lib/redis.js";
 
-interface IBody {
-  email: string;
-  password: string;
-}
 
-const generateToken = (
-  userId: Types.ObjectId
-): { accessToken: string; refreshToken: string } => {
+const generateToken = (userId) => {
   const accessSecret = process.env.ACCESS_SECRET_KEY;
   const refreshSecret = process.env.REFRESH_SECRET_KEY;
 
@@ -29,10 +21,7 @@ const generateToken = (
 };
 
 // store refresh token and user._id to redis
-const storeRefreshToken = async (
-  userId: Types.ObjectId,
-  refreshToken: string
-) => {
+const storeRefreshToken = async (userId,refreshToken) => {
   // key,value,optional can include expiration time in key value pair(ttl-time to live) - refresh_token:${userId}`,refreshToken,"EX",7*24*60*60
   await redis.set(
     `refresh_token:${userId}`,
@@ -42,11 +31,7 @@ const storeRefreshToken = async (
   ); //EX should be in capital letter
 };
 // set cookie
-const setCookie = (
-  res: Response,
-  accessToken: string,
-  refreshToken: string
-) => {
+const setCookie = (res,accessToken,refreshToken) => {
   res.cookie("accessToken", accessToken, {
     httpOnly: true, //prevent Xss attacks ,cross site scripting attack
     secure: process.env.Node_Env === "production",
@@ -62,13 +47,9 @@ const setCookie = (
 };
 
 //Promise<Response | void> this means this fun might return nothing (void) or res.json (Response)
-export const signupController = async (
-  req: Request<{}, {}, IUser>,
-  res: Response
-): Promise<Response | void> => {
+export const signupController = async (req,res) => {
   try {
     const { name, email, password, role } = req.body;
-    
 
     // Check for existing user
     const user = await User.findOne({ email });
@@ -93,7 +74,7 @@ export const signupController = async (
       success: true,
       message: "User successfully registered",
     });
-  } catch (err: unknown) {
+  } catch (err) {
     console.error("Signup Error:", err);
     const errorMessage =
       err instanceof Error ? err.message : "Unknown error occurred";
@@ -106,15 +87,12 @@ export const signupController = async (
 };
 
 // Stub implementations for other controllers
-export const signinController = async (
-  req: Request<{}, {}, IBody>,
-  res: Response
-): Promise<Response | void> => {
+export const signinController = async (req,res) => {
   // api/auth/login - comparepassword with comparePassword method in user model - generate accesstoke with 15m ex and refresh token with 7d - set both in cookies
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-
+    
     if (!user) {
       return res.status(400).json({
         success: false,
@@ -147,7 +125,7 @@ export const signinController = async (
       },
       message: "User successfully logged in",
     });
-  } catch (err: unknown) {
+  } catch (err) {
     console.error("Signin Error:", err);
     const errorMessage =
       err instanceof Error ? err.message : "Unknown error occurred";
@@ -159,20 +137,14 @@ export const signinController = async (
   }
 };
 
-export const logoutController = async (
-  req: Request,
-  res: Response
-): Promise<Response | void> => {
+export const logoutController = async (req,res)=> {
   // api/auth/logout - clear refresh token from redis - clear acccess and refresh token from cookie
   try {
     // for to delete the refresh token from redis
     const refreshToken = req.cookies.refreshToken;
 
     if (refreshToken) {
-      const { userId } = jwt.verify(
-        refreshToken,
-        process.env.Refresh_Secret_Key!
-      ) as JwtPayload; //By adding the as JwtPayload type assertion, you're telling TypeScript that you're certain that the value returned by jwt.verify() is a JwtPayload object with a userId property.
+      const { userId } = jwt.verify(refreshToken, process.env.Refresh_Secret_Key); //By adding the as JwtPayload type assertion, you're telling TypeScript that you're certain that the value returned by jwt.verify() is a JwtPayload object with a userId property.
       await redis.del(`refresh_token:${userId}`); //delete refresh token from redis with key refresh_token:${decodetoken}
     }
     res.clearCookie("accessToken");
@@ -181,7 +153,7 @@ export const logoutController = async (
       success: true,
       message: "User successfully logged out",
     });
-  } catch (err: unknown) {
+  } catch (err) {
     console.error("Signup Error:", err);
     const errorMessage =
       err instanceof Error ? err.message : "Unknown error occurred";
@@ -193,10 +165,7 @@ export const logoutController = async (
   }
 };
 
-export const refreshTokenController = async (
-  req: Request,
-  res: Response
-): Promise<Response | void> => {
+export const refreshTokenController = async (req,res)=> {
   try {
     const refreshToken = req.cookies.refreshToken;
 
@@ -206,10 +175,7 @@ export const refreshTokenController = async (
         message: "Unathorized,No refresh token",
       });
     }
-    const { userId } = jwt.verify(
-      refreshToken,
-      process.env.Refresh_Secret_Key!
-    ) as JwtPayload;
+    const { userId } = jwt.verify(refreshToken, process.env.Refresh_Secret_Key) ;
     const redistoken = await redis.get(`refresh_token:${userId}`);
     if (!redistoken || redistoken !== refreshToken) {
       return res.status(401).json({
@@ -219,7 +185,7 @@ export const refreshTokenController = async (
     }
     const newAccesstoken = jwt.sign(
       { userId: userId },
-      process.env.Access_Secret_Key!,
+      process.env.Access_Secret_Key ,
       {
         expiresIn: "15m",
       }
@@ -234,7 +200,7 @@ export const refreshTokenController = async (
       success: true,
       message: "Access Token is successfully refreshed",
     });
-  } catch (err: unknown) {
+  } catch (err) {
     console.error("Refresh Token Error:", err);
     const errorMessage =
       err instanceof Error ? err.message : "Unknown error occurred";
@@ -246,7 +212,7 @@ export const refreshTokenController = async (
   }
 };
 
-export const getprofile = async (req: Request & { user?: IUser }, res: Response) => {
+export const getprofile = async (req,res) => {
   try {
     return res.status(200).json({
       success: true,

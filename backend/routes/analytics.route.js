@@ -1,13 +1,10 @@
-import e, { Request, Response } from "express";
-import { dailysalesData, getanalyticsData } from "../controller/analytics.controller";
-import { adminroute, protectedroute } from "../middleware/auth.middleware";
+import e from "express";
+import { dailysalesData, getanalyticsData } from "../controller/analytics.controller.js";
+import { adminroute, protectedroute } from "../middleware/auth.middleware.js";
 
 const route = e.Router();   
 
-route.get("/", protectedroute , adminroute , async (
-    req: Request,
-    res: Response
-  ): Promise<Response | void> => {
+route.get("/", protectedroute , adminroute , async (req,res) => {
     //  we want total number of users and total number of products and total number of orders and total revinue
     try {
       const analyticsData = await getanalyticsData();

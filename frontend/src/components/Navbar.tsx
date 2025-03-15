@@ -20,9 +20,11 @@ const Navbar = () => {
         AP Store</Link>
 
         <nav className="flex flex-wrap items-center gap-4">
-          <Link to="/" className='text-gray-300 hover:text-emerald-300 transition duration-300 ease-in-out'>Home</Link>
+          { (user && user?.user?.role !== "admin") && 
+          <Link to="/" className='text-gray-300 hover:text-emerald-300 transition duration-300 ease-in-out'>Home</Link>}
+          
           {
-            user && (
+            (user && user?.user?.role !== "admin") && (
               <Link to="/cart" className='relative group text-gray-300 hover:text-emerald-300 transition duration-300 ease-in-out'>
                 <ShoppingCart className="inline-block mr-1 group-hover:text-emerald-300" size={20}/>
                 <span className='hidden sm:inline'>Cart</span>

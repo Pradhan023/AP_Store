@@ -16,6 +16,7 @@ interface IProductStore {
   toggleFeaturedProduct: (id: string) => Promise<void>;
   fetchPrductByCategory: (category: string) => Promise<void>;
   getRecommandedProduct:()=>void;
+  getfeaturedProduct:()=>void;
 }
 
 const useProductStore = create<IProductStore>((set) => ({
@@ -113,6 +114,15 @@ const useProductStore = create<IProductStore>((set) => ({
     try {
         const res =  await axiosInstance.get("/products/recommendation");
         set({loading:false,recommandedProducts:res.data.data})
+    } catch (error) {
+        set({loading:false})
+    }
+    },
+  getfeaturedProduct : async()=>{
+    set({loading:true})
+    try {
+        const res =  await axiosInstance.get("/products/featuredproducts");
+        set({loading:false,products:res.data.data})
     } catch (error) {
         set({loading:false})
     }

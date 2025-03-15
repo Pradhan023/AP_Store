@@ -1,18 +1,5 @@
 import mongoose from "mongoose";
 
-interface Iproducts{
-    product:mongoose.Types.ObjectId;
-    quantity:Number;
-    price:Number;
-}
-
-interface IOrder {
-    user:mongoose.Types.ObjectId;
-    product:Iproducts[];
-    totalAmount:Number;
-    stripeSessionId:string;
-}
-
 const Orderschema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -51,6 +38,6 @@ const Orderschema = new mongoose.Schema({
 { timestamps: true }
 );
 
-const Order = mongoose.model<IOrder>("Order",Orderschema);
+const Order = mongoose.model("Order",Orderschema);
 
-export { Order,Iproducts}
+export { Order }

@@ -1,9 +1,8 @@
-import { NextFunction, Request, Response } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { IUser, User } from "../model/user.model";
+import jwt from "jsonwebtoken";
+import { User } from "../model/user.model.js";
 
 
-export const protectedroute = async(req:Request & {user?:IUser},res:Response,next:NextFunction)=>{
+export const protectedroute = async(req,res,next)=>{
     try{
         const token = req.cookies.accessToken;
         if(!token){
@@ -12,7 +11,7 @@ export const protectedroute = async(req:Request & {user?:IUser},res:Response,nex
                 message:"Unthorized, No access token Provided"
             })
         }
-        const decoded = jwt.verify(token,process.env.Access_Secret_Key!) as JwtPayload
+        const decoded = jwt.verify(token,process.env.Access_Secret_Key)
         const user = await User.findOne({_id:decoded.userId}).select("-password"); //- ignore password
         if(!user){
             return res.status(401).json({
@@ -32,7 +31,7 @@ export const protectedroute = async(req:Request & {user?:IUser},res:Response,nex
     }
 }
 
-export const adminroute = async(req:Request & {user?:IUser} , res:Response,next:NextFunction)=>{
+export const adminroute = async(req,res,next)=>{
     if(req.user?.role === "admin"){
         next();
     }

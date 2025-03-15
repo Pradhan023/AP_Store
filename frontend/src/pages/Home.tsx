@@ -1,10 +1,15 @@
+import { useEffect } from "react";
 import CategorySection from "../components/CategorySection";
 import FeaturedProducts from "../components/FeaturedProducts";
 import useProductStore from "../stores/productStore";
 import { categories } from "../utils/catgory";
 
 const Home = () => {
-  const{products,loading} = useProductStore();
+  const{products,loading,getfeaturedProduct} = useProductStore();
+  useEffect(() => {
+    getfeaturedProduct();
+  },[getfeaturedProduct]);
+
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
