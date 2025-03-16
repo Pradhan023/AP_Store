@@ -23,7 +23,7 @@ const AdminDashboard = () => {
 
 	return (
 		<div className='min-h-screen relative overflow-hidden '>
-			<div className='relative z-10 container mx-auto px-4 py-16'>
+			<div className='relative z-10 container mx-auto px-4 py-20'>
 				<motion.h1
 					className='text-4xl font-bold mb-8 text-emerald-400 text-center'
 					initial={{ opacity: 0, y: -20 }}
@@ -38,7 +38,7 @@ const AdminDashboard = () => {
 						<button
 							key={tab.id}
 							onClick={() => setActiveTab(tab.id)}
-							className={`flex items-center px-4 py-2 mx-2 rounded-md transition-colors duration-300 ease-in ${
+							className={`flex items-center px-2 py-1 text-xs md:px-4 lg:px-4 lg:py-2 md:py-2 lg:text-xl md:text-xl mx-2 rounded-md transition-colors duration-300 ease-in ${
 								activeTab === tab.id
 									? "bg-emerald-600 text-white"
 									: "bg-gray-700 text-gray-300 hover:bg-gray-600"
