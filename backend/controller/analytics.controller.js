@@ -2,7 +2,7 @@ import { User } from "../model/user.model.js";
 import { Product } from "../model/product.model.js";
 import { Order } from "../model/order.model.js";
 
-export const getanalyticsData = async () => {
+export const getanalyticsData = async() => {
   const totalUser = await User.countDocuments({}); //countDocuments() is a mongoose method which is used to count the number of documents in the collection
   const totalProduct = await Product.countDocuments({});
 
@@ -19,6 +19,7 @@ export const getanalyticsData = async () => {
       },
     },
   ]);
+
 
   const { totalSales, totalRevenue } = sales[0] || {
     totalSales: 0,
@@ -110,7 +111,6 @@ export const dailysalesData = async (startDate,endDate) => {
     const dateArray = getDatesInRange(startDate, endDate);
     return dateArray.map((date) => {
       const foundData = salesdata.find((item) => item._id === date);
-      
       return {
         date,
         sales: foundData?.sales || 0,

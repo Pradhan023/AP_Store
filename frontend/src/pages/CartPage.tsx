@@ -10,7 +10,7 @@ import PeopleAlsoBought from "../components/PeopleAlsoBought";
 const CartPage = () => {
 	const { cartItem } = useCart();
 	return (
-		<div className='py-8 md:py-16'>
+		<div className='py-8 md:py-16 min-h-[92.7vh]'>
 			<div className='mx-auto max-w-screen-xl px-4 2xl:px-0'>
 				<div className='mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8'>
 					<motion.div

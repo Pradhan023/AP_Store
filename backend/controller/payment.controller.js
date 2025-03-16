@@ -3,10 +3,11 @@ import { User } from "../model/user.model.js";
 import { stripe } from "../lib/stripe.js";
 import dotenv from "dotenv";
 import { Order } from "../model/order.model.js";
+import mongoose from "mongoose";
 
 dotenv.config();
 
-export const createCheckoutSession = async (req,res) => {
+export const createCheckoutSession = async (req, res) => {
   try {
     // product (in array) and couponCode if user have in body
     const { products, couponCode } = req.body;
@@ -45,7 +46,7 @@ export const createCheckoutSession = async (req,res) => {
     if (couponCode) {
       coupon = await Coupon.findOne({
         code: couponCode,
-        userId: req.user?.id, 
+        userId: req.user?.id,
 
         isActive: true,
       });
@@ -55,7 +56,6 @@ export const createCheckoutSession = async (req,res) => {
         );
       }
     }
-
 
     // create session for payment , it will redirect to strip payment page , with this session id which we will get from here
     const session = await stripe.checkout.sessions.create({
@@ -143,7 +143,7 @@ export const createCheckoutSession = async (req,res) => {
 };
 
 //  user will be redirected to this page after successful payment , user wants to check the status of the payment is success or not , for this we create order in our database
-export const checkoutSuccess = async (req,res) => {
+export const checkoutSuccess = async (req, res) => {
   try {
     const { sessionId } = req.body; // it will get the session id from the body which we get from the strip payment page after successful payment , this will use to get the status of the payment
     const session = await stripe.checkout.sessions.retrieve(sessionId); // it will get the status of the payment
@@ -151,21 +151,55 @@ export const checkoutSuccess = async (req,res) => {
     if (session.payment_status === "paid") {
       // it will check the status of the payment is paid or not
       // deactivate the coupon so that user can not use it again
-      if (session.metadata) {
-        if (session.metadata.couponCode) {
+      if (session?.metadata) {
+        if (session.metadata?.couponCode) {
           await Coupon.findOneAndUpdate(
             {
-              code: session.metadata.couponCode,
-              userId: session.metadata.userId,
+              code: session.metadata?.couponCode,
+              userId: session.metadata?.userId,
             },
             { isActive: false }
           );
         }
+
+        
+        const products = JSON.parse(session.metadata?.products);
+
+        // check
+        const existingOrder = await Order.findOne({
+          stripeSessionId: sessionId,
+        });
+        if (existingOrder) {
+          // Order already exists,
+          const newOrder = await Order.findOneAndUpdate(
+            { stripeSessionId: sessionId },
+            {
+              user: session.metadata?.userId,
+              products: products.map((item) => ({
+                product: item.product,
+                quantity: item.quantity,
+                price: item.price,
+              })),
+              totalAmount: session?.amount_total
+                ? session.amount_total / 100
+                : 0,
+              stripeSessionId: sessionId,
+            },
+            { upsert: true, new: true }
+          );
+          return res.status(200).json({
+            success: true,
+            message: "Order already created",
+            orderId: existingOrder._id,
+          });
+        }
         //   create order in our database
-        const products = JSON.parse(session.metadata.products);
+        const orderId = new mongoose.Types.ObjectId();
         const neworder = new Order(
           {
-            user: session.metadata.userId,
+            _id: orderId,
+            user: req.user._id,
+            user: session.metadata?.userId,
             products: products.map((item) => ({
               product: item.product,
               quantity: item.quantity,
@@ -175,8 +209,10 @@ export const checkoutSuccess = async (req,res) => {
             totalAmount: session?.amount_total ? session.amount_total / 100 : 0, // amount_total is in cent strip understand in this way so we have to convernt in dollar or ruppe by dividing it by 100 also amount_total property is total or order amount which strip will give us
             stripeSessionId: sessionId,
           },
-          { upsert: true, new: true }
+          { upsert: true, new: true } // it will update the order if it already exists or create a new one
         );
+
+        await neworder.save();
 
         await clearUserCart(session.metadata.userId);
 
