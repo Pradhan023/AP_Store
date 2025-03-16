@@ -3,16 +3,17 @@ import { useParams } from "react-router-dom";
 import useProductStore from "../stores/productStore";
 import { motion } from "framer-motion";
 import ProductCard from "../components/ProductCard";
+import LoadingSpinner from "../components/Spinner";
 
 const CatrgoryPage: React.FC = () => {
   const { category } = useParams();
-  const { products, fetchPrductByCategory } = useProductStore();
+  const { products, fetchPrductByCategory, loading } = useProductStore();
 
   useEffect(() => {
-    (async()=>{
-      await fetchPrductByCategory(category as string);
-    })()
+    fetchPrductByCategory(category as string);
   }, [category]);
+
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="min-h-screen">
