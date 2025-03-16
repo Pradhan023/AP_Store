@@ -4,7 +4,6 @@ import { redis } from "../lib/redis.js";
 
 
 const generateToken = (userId) => {
-
   const accessToken = jwt.sign({ userId }, process.env.ACCESS_SECRET_KEY, {
     expiresIn: "15m",
   });
@@ -27,6 +26,7 @@ const storeRefreshToken = async (userId,refreshToken) => {
 };
 // set cookie
 const setCookie = (res,accessToken,refreshToken) => {
+  
   res.cookie("accessToken", accessToken, {
     httpOnly: true, //prevent Xss attacks ,cross site scripting attack
     secure: process.env.Node_Env === "production",

@@ -1,4 +1,6 @@
 import dotenv from 'dotenv'
+dotenv.config();
+
 import express from "express";
 import authroutes from "./routes/auth.route.js";
 import productroutes from "./routes/product.route.js";
@@ -11,7 +13,6 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors';
 import path from 'path';
 
-dotenv.config();
 
 const app = express();
 
@@ -22,7 +23,7 @@ const __dirname = path.resolve(); //  is used to get the current working directo
 
 // CORS middleware
 app.use(cors({
-    origin: 'http://localhost:5173', // Your frontend URL
+    origin: process.env.Client_Url, // Your frontend URL
     credentials: true, // This allows cookies to be sent
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   }));
