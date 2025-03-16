@@ -27,7 +27,7 @@ const App = () => {
 	}, [getCartProduct, user]);
 
   if(checkingAuth) return <LoadingSpinner />
-  console.log(import.meta.env.VITE_ENV!)
+
   return (
     <Layout>
       <Routes>
