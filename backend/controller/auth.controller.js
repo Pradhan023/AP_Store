@@ -29,13 +29,13 @@ const setCookie = (res,accessToken,refreshToken) => {
   
   res.cookie("accessToken", accessToken, {
     httpOnly: true, //prevent Xss attacks ,cross site scripting attack
-    secure: process.env.Node_Env === "production",
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict", //prevent CSRF attacks , cross site request forgery attack
     maxAge: 15 * 60 * 1000, //15mins
   });
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true, //prevent Xss attacks ,cross site scripting attack
-    secure: process.env.Node_Env === "production",
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict", //prevent CSRF attacks , cross site request forgery attack
     maxAge: 7 * 24 * 60 * 60 * 1000, //7days
   });
@@ -139,7 +139,7 @@ export const logoutController = async (req,res)=> {
     const refreshToken = req.cookies.refreshToken;
 
     if (refreshToken) {
-      const { userId } = jwt.verify(refreshToken, process.env.Refresh_Secret_Key); //By adding the as JwtPayload type assertion, you're telling TypeScript that you're certain that the value returned by jwt.verify() is a JwtPayload object with a userId property.
+      const { userId } = jwt.verify(refreshToken, process.env.REFRESH_SECRET_KEY); //By adding the as JwtPayload type assertion, you're telling TypeScript that you're certain that the value returned by jwt.verify() is a JwtPayload object with a userId property.
       await redis.del(`refresh_token:${userId}`); //delete refresh token from redis with key refresh_token:${decodetoken}
     }
     res.clearCookie("accessToken");
@@ -170,7 +170,7 @@ export const refreshTokenController = async (req,res)=> {
         message: "Unathorized,No refresh token",
       });
     }
-    const { userId } = jwt.verify(refreshToken, process.env.Refresh_Secret_Key) ;
+    const { userId } = jwt.verify(refreshToken, process.env.REFRESH_SECRET_KEY) ;
     const redistoken = await redis.get(`refresh_token:${userId}`);
     if (!redistoken || redistoken !== refreshToken) {
       return res.status(401).json({
@@ -180,14 +180,14 @@ export const refreshTokenController = async (req,res)=> {
     }
     const newAccesstoken = jwt.sign(
       { userId: userId },
-      process.env.Access_Secret_Key ,
+      process.env.ACCESS_SECRET_KEY ,
       {
         expiresIn: "15m",
       }
     );
     res.cookie("accessToken", newAccesstoken, {
       httpOnly: true,
-      secure: process.env.Node_Env === "production",
+      secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       maxAge: 15 * 60 * 1000,
     });

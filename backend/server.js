@@ -23,7 +23,7 @@ const __dirname = path.resolve(); //  is used to get the current working directo
 
 // CORS middleware
 app.use(cors({
-    origin: process.env.Client_Url, // Your frontend URL
+    origin: process.env.CLIENT_URL, // Your frontend URL
     credentials: true, // This allows cookies to be sent
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   }));

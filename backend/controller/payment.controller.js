@@ -62,8 +62,8 @@ export const createCheckoutSession = async (req, res) => {
       payment_method_types: ["card"], // it can be card or any other payment method like netbanking
       line_items: lineItems,
       mode: "payment", // it can be payment or subscription
-      success_url: `${process.env.Client_Url}/purchase-success?session_id={CHECKOUT_SESSION_ID}`, // it will redirect to success page after successful payment
-      cancel_url: `${process.env.Client_Url}/purchase-cancel`,
+      success_url: `${process.env.CLIENT_URL}/purchase-success?session_id={CHECKOUT_SESSION_ID}`, // it will redirect to success page after successful payment
+      cancel_url: `${process.env.CLIENT_URL}/purchase-cancel`,
       discounts: coupon
         ? [
             {

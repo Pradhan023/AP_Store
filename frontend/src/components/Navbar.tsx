@@ -39,9 +39,9 @@ const Navbar = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-gray-900 bg-opacity-90 backdrop-blur-md shadow-lg z-40 transition-all duration-300 border-b border-emerald-800">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between flex-wrap">
+    <header className="fixed top-0 left-0 w-full bg-gray-900 bg-opacity-90 backdrop-blur-md shadow-lg z-40 transition-all duration-300 border-b border-emerald-800 ">
+      <div className="container mx-auto px-4 py-3 ">
+        <div className="flex items-center justify-between flex-wrap ">
           <Link
             to="/"
             className="text-2xl font-bold space-x-2 flex items-center text-emerald-300"
@@ -135,7 +135,7 @@ export default Navbar;
 const SideNav = ({ isMenuOpen, toggleMenu, user, isAdmin, Logout, cartItem }: any) => {
   return (
     <>
-      <div className="md:hidden lg:hidden flex justify-center items-center">
+      <div className=" sm:hidden md:hidden lg:hidden flex justify-center items-center">
       {user && user?.user?.role !== "admin" && (
               <Link
                 to="/cart"

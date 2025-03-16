@@ -1,7 +1,7 @@
 {
   "name": "apstore",
   "version": "1.0.0",
-  "description": "",
+  "description": "Ecommerce store",
   "main": "backend/server.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
@@ -12,7 +12,7 @@
     "serve": "node backend/server.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Anish Pradhan",
   "license": "ISC",
   "type": "module",
   "dependencies": {
