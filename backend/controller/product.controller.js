@@ -59,41 +59,65 @@ export const getFeaturedProductsController = async (req,res)=>{
   }
 }
 
-export const createProductController = async(req,res)=>{
-  try{
-    const{name,description,price,category} = req.body;
-    const image = req?.file?.path;  // req.file.path is used to get the path of the uploaded image
-    
-    // upload image in cloudinary
-    if(!image){
+export const createProductController = async (req, res) => {
+  try {
+    const { name, description, price, category } = req.body;
+
+    // Validate required fields
+    if (!name || !description || !price || !category) {
       return res.status(400).json({
-        success:false,
-        message:"Image is required"
-      })
+        success: false,
+        message: "All fields are required",
+      });
     }
-    const {secure_url,public_id} = await cloudinary.uploader.upload(image,{folder:"products"}); 
-    fs.unlinkSync(image); // delete image from local storage after uploading in cloudinary from upload folder
-    const newcreate = await Product.create({
+
+    // Check if file exists
+    if (!req.file || !req.file.path) {
+      return res.status(400).json({
+        success: false,
+        message: "Image is required",
+      });
+    }
+    const image = req.file.path;
+
+    // Upload image to Cloudinary (wrap in try-catch)
+    let secure_url, public_id;
+    try {
+      const uploadResponse = await cloudinary.uploader.upload(image, { folder: "products" });
+      secure_url = uploadResponse.secure_url;
+      public_id = uploadResponse.public_id;
+
+      // Delete local file only after successful upload
+      fs.unlinkSync(image);
+    } catch (uploadError) {
+      console.error("Cloudinary Upload Error:", uploadError);
+      return res.status(500).json({
+        success: false,
+        message: "Image upload failed",
+      });
+    }
+
+    // Create Product in DB
+    const newProduct = await Product.create({
       name,
       description,
       price,
-      image:{ url:secure_url,publicId:public_id },
-      category
-    })
+      image: { url: secure_url, publicId: public_id },
+      category,
+    });
 
     return res.status(201).json({
-      success:true,
-      data:newcreate
-    })
-  }
-  catch(err){
-    console.log(err);
+      success: true,
+      data: newProduct,
+    });
+  } catch (err) {
+    console.error("Product Creation Error:", err);
     return res.status(500).json({
-      success:false,
-      message:"Internal Server error"
-    })
+      success: false,
+      message: "Internal Server Error",
+    });
   }
-}
+};
 
 export const deleteProductController = async(req,res)=>{
   try{
