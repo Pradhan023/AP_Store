@@ -63,58 +63,57 @@ export const createProductController = async (req, res) => {
   try {
     const { name, description, price, category } = req.body;
 
-    // Validate required fields
-    if (!name || !description || !price || !category) {
+    if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required",
+        message: "Image is required"
       });
     }
 
-    // Check if file exists
-    if (!req.file || !req.file.path) {
-      return res.status(400).json({
-        success: false,
-        message: "Image is required",
+    let imageUrl, publicId;
+
+    if (process.env.NODE_ENV === "production") {
+      // Upload from memory (Cloudinary upload_stream) 
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream({ folder: "products" }, (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        });
+
+        stream.end(req.file.buffer);//this will upload the image to cloudinary
       });
-    }
-    const image = req.file.path;
 
-    // Upload image to Cloudinary (wrap in try-catch)
-    let secure_url, public_id;
-    try {
-      const uploadResponse = await cloudinary.uploader.upload(image, { folder: "products" });
-      secure_url = uploadResponse.secure_url;
-      public_id = uploadResponse.public_id;
-
-      // Delete local file only after successful upload
-      fs.unlinkSync(image);
-    } catch (uploadError) {
-      console.error("Cloudinary Upload Error:", uploadError);
-      return res.status(500).json({
-        success: false,
-        message: "Image upload failed",
-      });
+      imageUrl = result.secure_url;
+      publicId = result.public_id;
+    } else {
+      //  Upload from local file (development)
+      const result = await cloudinary.uploader.upload(req.file.path, { folder: "products" });
+      imageUrl = result.secure_url;
+      publicId = result.public_id;
+      
+      // Delete the local file after uploading to Cloudinary
+      fs.unlinkSync(req.file.path);
     }
 
-    // Create Product in DB
+    // Save product to DB
     const newProduct = await Product.create({
       name,
       description,
       price,
-      image: { url: secure_url, publicId: public_id },
-      category,
+      image: { url: imageUrl, publicId },
+      category
     });
 
     return res.status(201).json({
       success: true,
-      data: newProduct,
+      data: newProduct
     });
+
   } catch (err) {
-    console.error("Product Creation Error:", err);
+    console.log(err);
     return res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: "Internal Server Error"
     });
   }
 };
