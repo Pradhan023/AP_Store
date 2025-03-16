@@ -26,7 +26,7 @@ const Home = () => {
           ))}
         </div>
 
-        {!loading && products.length > 0 && (
+        {!loading && products?.length > 0 && (
           <FeaturedProducts featuredProducts={products} />
         )}
       </div>
