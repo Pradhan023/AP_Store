@@ -9,8 +9,10 @@ const CatrgoryPage: React.FC = () => {
   const { products, fetchPrductByCategory } = useProductStore();
 
   useEffect(() => {
-    fetchPrductByCategory(category!);
-  }, [fetchPrductByCategory, category]);
+    (async()=>{
+      await fetchPrductByCategory(category as string);
+    })()
+  }, [category]);
 
   return (
     <div className="min-h-screen">
