@@ -12,6 +12,7 @@ import connection from './lib/db.js';
 import cookieParser from 'cookie-parser'
 import cors from 'cors';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 
 const app = express();
@@ -19,7 +20,6 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
-const __dirname = path.resolve(); //  is used to get the current working directory, which is the directory containing the current file returns the absolute path
 
 // CORS middleware
 app.use(cors({
@@ -41,15 +41,21 @@ app.use('/api/payment',paymentroutes);
 app.use('/api/analytics',analyticsroutes);
 
 
+//  __dirname in ES Modules
+const __filename = fileURLToPath(import.meta.url); // this will get the path to the current file
+const __dirname = path.dirname(__filename); // this will get the path to the directory of the current file
+
+// path to frontend `dist` folder from backend
+const buildPath = path.join(__dirname, "../frontend/dist"); // this will get the path to the frontend dist folder
+
 if (process.env.NODE_ENV === "production") {
-	app.use(express.static(path.join(__dirname, "frontend/dist"))); // this will serve the static files from the build folder ,
+    app.use(express.static(buildPath));// this will serve the static files from the build folder ,
 
-	app.get("*", (req, res) => { // * means any route (wild card  ) , this will send the index.html file to the client , other than the routes defined above , only frontend route
-		res.sendFile(path.resolve(__dirname, "frontend/dist", "index.html")); // this will send the index.html file to the client and this is the path to the index.html file 
-	});
+    app.get("*", (req, res) => {  // * means any route (wild card  ) , this will send the index.html file to the client , other than the routes defined above , only frontend route
+        res.sendFile(path.join(buildPath, "index.html"));  // this will send the index.html file to the client and this is the path to the index.html file 
+    });
 }
-
-
+console.log(import.meta.url)
 
 app.listen(PORT,()=>{
     console.log(`Sever is live on Port ${PORT}`)
