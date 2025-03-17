@@ -12,6 +12,7 @@ import connection from './lib/db.js';
 import cookieParser from 'cookie-parser'
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs'
 
 
 const app = express();
@@ -63,7 +64,7 @@ if (process.env.NODE_ENV === "production") {
     console.log('Using frontend path:', frontendPath);
     
     // Verify if the directory exists
-    const fs = require('fs');
+    
     if (!fs.existsSync(frontendPath)) {
       console.error(`Frontend path does not exist: ${frontendPath}`);
     }
