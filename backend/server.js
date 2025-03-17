@@ -45,15 +45,44 @@ app.use('/api/analytics',analyticsroutes);
 
 // Serve static files and handle client-side routing in production
 if (process.env.NODE_ENV === "production") {
-    // Since server.js is in the backend folder, we need to go up one level to reach frontend
-    const frontendPath = path.join(__dirname, '..', 'frontend', 'dist');
+    // Log the current directory to help with debugging
+    console.log('Current directory:', __dirname);
+    
+    // Try a different path resolution approach for Render deployment
+    let frontendPath;
+    
+    // Check if we're on Render (based on the error path you shared)
+    if (__dirname.includes('/opt/render/project')) {
+      // On Render, the path might be structured differently
+      frontendPath = path.join(__dirname, 'frontend', 'dist');
+    } else {
+      // Local development path
+      frontendPath = path.join(__dirname, '..', 'frontend', 'dist');
+    }
+    
+    console.log('Using frontend path:', frontendPath);
+    
+    // Verify if the directory exists
+    const fs = require('fs');
+    if (!fs.existsSync(frontendPath)) {
+      console.error(`Frontend path does not exist: ${frontendPath}`);
+    }
     
     // Serve static files
     app.use(express.static(frontendPath));
     
     // Handle client-side routing
     app.get('*', (req, res) => {
-      res.sendFile(path.join(frontendPath, 'index.html'));
+      const indexPath = path.join(frontendPath, 'index.html');
+      console.log('Attempting to serve:', indexPath);
+      
+      // Check if the file exists before sending
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        console.error(`Index file not found at: ${indexPath}`);
+        res.status(404).send('Build files not found. Make sure you have built the frontend.');
+      }
     });
   }
 
