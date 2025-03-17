@@ -4,7 +4,7 @@ import path from 'path';
 
 // https://vite.dev/config/
 export default defineConfig({
-  envDir: '../',    // to get env variables which is in global monorepo
+  envDir: '.',    // to get env variables which is in global monorepo
   build: {
     outDir: 'dist', // Set the output directory
     chunkSizeWarningLimit: 1000, // Set higher threshold (in KB)
