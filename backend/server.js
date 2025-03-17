@@ -46,7 +46,7 @@ const __filename = fileURLToPath(import.meta.url); // this will get the path to 
 const __dirname = path.dirname(__filename); // this will get the path to the directory of the current file
 
 // path to frontend `dist` folder from backend
-const buildPath = path.join(__dirname, "../frontend/dist"); // this will get the path to the frontend dist folder
+const buildPath = path.join(__dirname, "frontend/dist"); // this will get the path to the frontend dist folder
 
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(buildPath));// this will serve the static files from the build folder ,
