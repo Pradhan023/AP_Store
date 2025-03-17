@@ -11,8 +11,6 @@ import analyticsroutes from "./routes/analytics.route.js"
 import connection from './lib/db.js';
 import cookieParser from 'cookie-parser'
 import cors from 'cors';
-import path from 'path';
-import fs from 'fs';
 
 
 const app = express();
@@ -39,46 +37,7 @@ app.use('/api/cart',cartroutes);
 app.use('/api/coupons',couponroutes);
 app.use('/api/payment',paymentroutes);
 app.use('/api/analytics',analyticsroutes);
-
-
-// For production
-if (process.env.NODE_ENV === 'production') {
-  console.log('Running in production mode');
   
-  // Try multiple potential frontend paths
-  const possiblePaths = [
-    path.join(__dirname, 'frontend', 'dist'),
-    path.join(__dirname, '..', 'frontend', 'dist'),
-    path.join(__dirname, '..', '..', 'frontend', 'dist'),
-    path.join(process.cwd(), 'frontend', 'dist')
-  ];
-  
-  // Find first path that exists
-  let frontendPath = null;
-  for (const pathToCheck of possiblePaths) {
-    console.log(`Checking if path exists: ${pathToCheck}`);
-    if (fs.existsSync(pathToCheck)) {
-      console.log(`Found frontend at: ${pathToCheck}`);
-      frontendPath = pathToCheck;
-      break;
-    }
-  }
-  
-  if (frontendPath) {
-    // Serve static files
-    app.use(express.static(frontendPath));
-    
-    // Handle client-side routing
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(frontendPath, 'index.html'));
-    });
-  } else {
-    console.log('WARNING: Frontend build not found, API-only mode');
-    app.get('*', (req, res) => {
-      res.send('Frontend not found. API endpoints are available at /api/*');
-    });
-  }
-}
 
 app.listen(PORT,()=>{
     console.log(`Sever is live on Port ${PORT}`)
