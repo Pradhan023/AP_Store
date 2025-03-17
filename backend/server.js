@@ -42,10 +42,10 @@ app.use('/api/analytics',analyticsroutes);
 
 
 if (process.env.NODE_ENV === "production") {
-	app.use(express.static(path.join(__dirname, "frontend/frontend/dist"))); // this will serve the static files from the build folder ,
+	app.use(express.static(path.join(__dirname, "frontend/dist"))); // this will serve the static files from the build folder ,
 
 	app.get("*", (req, res) => { // * means any route (wild card  ) , this will send the index.html file to the client , other than the routes defined above , only frontend route
-		res.sendFile(path.resolve(__dirname, "frontend/frontend/dist", "index.html")); // this will send the index.html file to the client and this is the path to the index.html file 
+		res.sendFile(path.resolve(__dirname, "frontend/dist", "index.html")); // this will send the index.html file to the client and this is the path to the index.html file 
 	});
 }
 
