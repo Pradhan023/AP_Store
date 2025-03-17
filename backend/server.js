@@ -19,6 +19,7 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
+// Create __dirname equivalent for ES modules
 const __dirname = path.resolve();
 
 
@@ -42,17 +43,19 @@ app.use('/api/payment',paymentroutes);
 app.use('/api/analytics',analyticsroutes);
 
 
+// Serve static files and handle client-side routing in production
 if (process.env.NODE_ENV === "production") {
-    const frontendPath = path.join(__dirname, 'frontend', 'dist');
-
-// Serve static files
-app.use(express.static(frontendPath));
-
-app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-});
+    // Since server.js is in the backend folder, we need to go up one level to reach frontend
+    const frontendPath = path.join(__dirname, '..', 'frontend', 'dist');
+    
+    // Serve static files
+    app.use(express.static(frontendPath));
+    
+    // Handle client-side routing
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(frontendPath, 'index.html'));
+    });
   }
-
 
 app.listen(PORT,()=>{
     console.log(`Sever is live on Port ${PORT}`)
