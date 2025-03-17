@@ -11,16 +11,12 @@ import analyticsroutes from "./routes/analytics.route.js"
 import connection from './lib/db.js';
 import cookieParser from 'cookie-parser'
 import cors from 'cors';
-import path from 'path';
 
 
 const app = express();
 
 
 const PORT = process.env.PORT || 3000;
-
-// Create __dirname equivalent for ES modules
-const __dirname = path.resolve();
 
 
 // CORS middleware
@@ -41,15 +37,6 @@ app.use('/api/cart',cartroutes);
 app.use('/api/coupons',couponroutes);
 app.use('/api/payment',paymentroutes);
 app.use('/api/analytics',analyticsroutes);
-
-
-if (process.env.NODE_ENV === "production") {
-	app.use(express.static(path.join(__dirname, "/frontend/dist")));
-
-	app.get("*", (req, res) => {
-		res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-	});
-}
 
 
 app.listen(PORT,()=>{
